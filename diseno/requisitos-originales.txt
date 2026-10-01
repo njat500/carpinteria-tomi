@@ -1,0 +1,503 @@
+Quiero crear una aplicación para **presupuestar proyectos de carpintería y calcular materiales necesarios**, con una interfaz sencilla, visual y fácil de usar.
+
+## PRIORIDAD PRINCIPAL
+
+La aplicación debe tener como **primera opción y pantalla principal** un apartado para **cargar proyectos/plano**, con dos formas de ingreso:
+
+1. **Subir un archivo**
+   - Permitir archivos de distintos formatos: PDF, JPG, PNG, WEBP, DWG, DXF, Excel, Word y otros formatos habituales.
+   - El sistema debe analizar el archivo cuando sea posible y extraer las medidas, cantidades y especificaciones del proyecto.
+   - Si el archivo no puede interpretarse automáticamente, permitir al usuario introducir los datos manualmente.
+
+2. **Cámara**
+   - Incluir un botón de cámara claramente visible.
+   - Permitir sacar una fotografía directamente desde el celular a planos, dibujos, croquis o medidas escritas a mano.
+   - La aplicación debe utilizar OCR/visión artificial para intentar detectar automáticamente las medidas y textos del plano.
+   - El usuario debe poder revisar y corregir las medidas detectadas antes de utilizarlas para calcular materiales.
+
+---
+
+# 1. CÁLCULO DE PLACAS
+
+La función principal debe calcular cuántas placas de madera/material en placa son necesarias para realizar el proyecto.
+
+La medida estándar inicial de una placa será:
+
+**2,60 m × 1,83 m**
+
+Área de una placa:
+
+**2,60 × 1,83 = 4,758 m²**
+
+IMPORTANTE: trabajar siempre con **4,758 m² por placa**, no 47,580 m².
+
+El sistema debe:
+
+- Permitir introducir las medidas de cada pieza.
+- Calcular automáticamente el área de cada pieza.
+- Sumar el área total.
+- Dividir el área total entre 4,758 m².
+- Mostrar la cantidad teórica de placas necesarias.
+- Redondear siempre hacia arriba para obtener la cantidad mínima de placas completas.
+
+Ejemplo:
+
+Proyecto:
+- Pieza A: 2,00 × 0,60 m
+- Pieza B: 1,50 × 0,40 m
+- Pieza C: 0,80 × 0,50 m
+
+La aplicación debe calcular automáticamente el área de cada pieza y el total.
+
+---
+
+# 2. DESPERDICIO Y OPTIMIZACIÓN DE CORTES
+
+No quiero que la aplicación se limite a dividir el área total por el área de una placa.
+
+Debe contemplar que en carpintería **la distribución de las piezas sobre las placas genera desperdicio**, incluso cuando el área matemática alcanza.
+
+Por eso debe existir un sistema de optimización de cortes.
+
+El usuario debe poder configurar:
+
+- Ancho de la placa.
+- Largo de la placa.
+- Espesor de la placa.
+- Ancho del corte de la sierra (kerf).
+- Margen de seguridad.
+- Porcentaje de desperdicio estimado, si se desea utilizar una estimación rápida.
+
+El sistema debe intentar distribuir las piezas dentro de las placas disponibles buscando reducir el desperdicio.
+
+Debe considerar:
+
+- Rotación de las piezas cuando sea posible.
+- Orientación de la veta cuando corresponda.
+- Espesor del corte de la sierra.
+- Márgenes.
+- Piezas que no entran por sus dimensiones.
+- Aprovechamiento de sobrantes.
+- Cantidad de placas completas necesarias.
+
+Mostrar dos resultados:
+
+**Cálculo teórico por superficie**
+- Área total.
+- Área por placa.
+- Cantidad matemática de placas.
+
+**Cálculo real de corte**
+- Cantidad de placas necesarias.
+- Área utilizada.
+- Área desperdiciada.
+- Porcentaje de desperdicio.
+- Sobrantes aprovechables.
+
+Si existe una diferencia entre ambos resultados, explicar claramente por qué.
+
+---
+
+# 3. LISTA DE PIEZAS / DESPIECE
+
+Crear una tabla de despiece donde cada pieza tenga:
+
+- Nombre.
+- Cantidad.
+- Largo.
+- Ancho.
+- Espesor.
+- Material.
+- Tipo de placa.
+- Orientación de veta.
+- Canto requerido.
+- Observaciones.
+
+Ejemplo:
+
+| Pieza | Cantidad | Largo | Ancho | Material | Canto |
+|---|---:|---:|---:|---|---|
+| Lateral | 2 | 0,80 m | 0,60 m | MDF 18 mm | 2 lados |
+| Tapa | 1 | 1,20 m | 0,60 m | MDF 18 mm | 4 lados |
+| Estante | 3 | 1,10 m | 0,30 m | MDF 18 mm | 1 lado |
+
+Permitir agregar, modificar y eliminar piezas manualmente.
+
+---
+
+# 4. CÁLCULO DE CANTOS
+
+La aplicación debe calcular automáticamente los **metros lineales de canto necesarios**.
+
+Cada pieza debe permitir seleccionar qué lados llevan canto:
+
+- Largo 1.
+- Largo 2.
+- Ancho 1.
+- Ancho 2.
+
+También debe existir una opción para seleccionar:
+
+- 1 lado.
+- 2 lados.
+- 3 lados.
+- 4 lados.
+
+La aplicación debe sumar todos los metros de canto necesarios.
+
+Ejemplo:
+
+Una pieza de 1,20 × 0,60 m con canto en los 4 lados:
+
+1,20 + 1,20 + 0,60 + 0,60 = **3,60 metros de canto**
+
+Si hay 5 piezas iguales:
+
+3,60 × 5 = **18 metros de canto**
+
+Mostrar:
+
+**Canto total requerido: 18 m**
+
+Agregar además un porcentaje de margen configurable para compensar desperdicio durante el canteado.
+
+Ejemplo:
+
+18 m + 10 % = **19,8 m recomendados**
+
+---
+
+# 5. MATERIALES DIFERENTES
+
+Un mismo proyecto puede utilizar diferentes materiales.
+
+Por ejemplo:
+
+- MDF 18 mm.
+- MDF 15 mm.
+- MDF 12 mm.
+- Melamina 18 mm.
+- Fenólico.
+- OSB.
+- Contrachapado.
+- Madera maciza.
+- Otro material personalizado.
+
+Cada material debe tener sus propias dimensiones de placa y precio.
+
+La aplicación debe separar automáticamente los cálculos por material.
+
+Ejemplo:
+
+**Melamina blanca 18 mm**
+- 4 placas
+- 19,032 m² utilizados
+- 3,96 m² desperdicio
+
+**MDF 18 mm**
+- 2 placas
+- 8,5 m² utilizados
+
+---
+
+# 6. PRECIOS Y PRESUPUESTO
+
+Además del cálculo de materiales, quiero que la aplicación pueda generar un presupuesto.
+
+Permitir introducir:
+
+### Materiales
+- Precio por placa.
+- Precio por metro de canto.
+- Precio por unidad de herraje.
+- Precio de otros materiales.
+
+### Mano de obra
+Permitir calcular:
+- Precio fijo.
+- Precio por hora.
+- Horas estimadas.
+- Porcentaje de mano de obra sobre materiales.
+
+### Otros gastos
+- Transporte.
+- Instalación.
+- Herramientas/consumibles.
+- Otros gastos personalizados.
+
+Mostrar:
+
+**Costo de materiales**
++
+**Costo de canto**
++
+**Costo de herrajes**
++
+**Mano de obra**
++
+**Otros gastos**
+=
+**Costo total**
+
+Luego permitir agregar:
+
+**Margen de ganancia (%)**
+
+Y calcular:
+
+**Precio final del proyecto**
+
+---
+
+# 7. RESULTADO VISUAL
+
+Al finalizar el cálculo quiero una pantalla resumen muy clara.
+
+Ejemplo:
+
+## PRESUPUESTO
+
+**Proyecto:** Mueble de cocina
+
+### Placas
+- Melamina 18 mm: 5 placas
+- MDF 18 mm: 1 placa
+
+### Canto
+- Canto blanco: 24,5 m
+- Margen incluido: 10 %
+
+### Despiece
+- 18 piezas
+
+### Desperdicio
+- 8,4 %
+
+### Materiales
+$XXX
+
+### Mano de obra
+$XXX
+
+### Otros
+$XXX
+
+### PRECIO FINAL
+**$XXX**
+
+---
+
+# 8. PLANO DE CORTE
+
+La aplicación debe generar visualmente un **plano de corte de cada placa**.
+
+Mostrar un rectángulo representando la placa de:
+
+**2600 × 1830 mm**
+
+Dentro de ella colocar las piezas indicando:
+
+- Nombre de la pieza.
+- Medidas.
+- Cantidad.
+- Orientación.
+
+También mostrar visualmente las áreas sobrantes.
+
+Si una pieza no entra, indicarlo claramente.
+
+Ejemplo:
+
+**PLACA 1**
+2600 × 1830 mm
+
+[Representación gráfica de los cortes]
+
+**Aprovechamiento: 91,4 %**
+
+**Desperdicio: 8,6 %**
+
+Esto debe permitir al carpintero llevar el plano directamente al taller.
+
+---
+
+# 9. DETECCIÓN AUTOMÁTICA DE PLANOS
+
+Cuando el usuario suba una foto o PDF de un plano, utilizar visión artificial/OCR para detectar:
+
+- Medidas.
+- Cantidades.
+- Nombres de piezas.
+- Materiales.
+- Espesores.
+- Indicaciones de canto.
+- Escala cuando esté disponible.
+
+IMPORTANTE:
+
+La IA **NO debe asumir que una medida detectada es correcta**.
+
+Después de analizar el plano, mostrar una pantalla de revisión:
+
+"Estas son las medidas detectadas. Revise antes de calcular."
+
+El usuario debe poder modificar cualquier dato.
+
+---
+
+# 10. BASE DE DATOS DE PROYECTOS
+
+Permitir guardar proyectos.
+
+Cada proyecto debe guardar:
+
+- Nombre.
+- Fecha.
+- Cliente.
+- Archivos originales.
+- Fotografías.
+- Lista de piezas.
+- Materiales.
+- Cálculo de placas.
+- Cálculo de cantos.
+- Desperdicio.
+- Costos.
+- Precio final.
+- Notas.
+
+Permitir duplicar un proyecto para utilizarlo como plantilla.
+
+---
+
+# 11. UNIDADES
+
+Trabajar principalmente en:
+
+- milímetros para cortes.
+- centímetros cuando sea necesario.
+- metros para superficies y cantos.
+
+Permitir cambiar las unidades.
+
+Los cálculos internos deben utilizar unidades consistentes para evitar errores.
+
+---
+
+# 12. INTERFAZ
+
+La aplicación debe estar diseñada principalmente para utilizarse desde un **celular en un taller**.
+
+Debe ser:
+
+- Simple.
+- Rápida.
+- Visual.
+- Con botones grandes.
+- Fácil de utilizar con una sola mano.
+- Sin menús innecesariamente complejos.
+
+La pantalla principal debe tener como primera opción:
+
+### 📷 ESCANEAR / SACAR FOTO DEL PLANO
+
+Y debajo:
+
+### 📁 SUBIR PROYECTO
+
+Después:
+
+### ➕ NUEVO PROYECTO
+
+Y:
+
+### 📂 MIS PROYECTOS
+
+---
+
+# 13. VALIDACIONES IMPORTANTES
+
+La aplicación debe advertir cuando:
+
+- Una pieza supera el tamaño de la placa.
+- Una pieza no puede acomodarse respetando la orientación de la veta.
+- El proyecto necesita más placas de las calculadas inicialmente por superficie debido al desperdicio.
+- Faltan medidas.
+- Hay medidas ambiguas detectadas en un plano.
+- El usuario intenta calcular sin haber seleccionado material.
+- El ancho/largo de placa es incorrecto.
+- El kerf es mayor que el margen disponible.
+
+Nunca ocultar errores de cálculo.
+
+---
+
+# 14. CONFIGURACIÓN PERSONALIZABLE
+
+Crear una sección de configuración donde pueda guardar:
+
+- Medidas estándar de mis placas.
+- Materiales habituales.
+- Precios.
+- Ancho de corte de mi sierra.
+- Porcentaje de desperdicio habitual.
+- Porcentaje de margen de ganancia.
+- Precio de mano de obra.
+- Precio del metro de canto.
+
+Así no tengo que introducir estos valores cada vez.
+
+---
+
+# 15. EXPORTACIÓN
+
+Permitir exportar el proyecto como:
+
+- PDF.
+- Excel/CSV.
+- Imagen del plano de corte.
+
+El PDF debe ser apto para enviar al cliente o imprimir en el taller.
+
+Debe incluir:
+
+- Nombre del proyecto.
+- Cliente.
+- Despiece.
+- Materiales.
+- Cantidad de placas.
+- Canto.
+- Plano de corte.
+- Costos.
+- Precio final.
+
+---
+
+# REQUISITO FUNDAMENTAL
+
+La aplicación debe diferenciar claramente entre:
+
+**"Cantidad de placas por superficie"**
+
+y
+
+**"Cantidad de placas necesarias según el despiece y los cortes reales".**
+
+Por ejemplo, si el área total de las piezas es 8 m²:
+
+8 ÷ 4,758 = 1,68 placas
+
+La aplicación puede mostrar:
+
+**Superficie matemática: 1,68 placas**
+
+pero si las piezas no pueden distribuirse correctamente en una sola placa y requieren dos placas:
+
+**Placas reales necesarias: 2**
+
+La cantidad final para comprar debe basarse en el **despiece y la optimización de cortes**, no únicamente en la división de superficies.
+
+El objetivo de la aplicación es que un carpintero pueda pasar de:
+
+**PLANO → DESPIECE → PLACAS → CANTOS → DESPERDICIO → COSTOS → PRESUPUESTO FINAL**
+
+con la menor cantidad posible de trabajo manual.

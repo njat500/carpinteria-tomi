@@ -1,0 +1,3 @@
+[functions.analyze-plan]
+# JWT is validated by Supabase Auth inside the handler, also supporting new signing keys.
+verify_jwt = false
